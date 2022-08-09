@@ -18,6 +18,7 @@ class CreateValutesTable extends Migration
             $table->string('valute')->unique();
             $table->string('char_code')->unique();
             $table->string('num_code')->unique();
+            $table->integer('nominal');
         });
     }
 
