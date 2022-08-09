@@ -55,7 +55,22 @@ class ValuteController extends Controller
 
         $this->index();
     }
-    public function add() {
-        return 'ass';
+
+    public function update() {
+        $xml = simplexml_load_string(file_get_contents($this->url));
+        $valutesData = [];
+        foreach ($xml->Valute as $valute) {
+            $correctValue = str_replace(',', '.', $valute->Value);
+            $valutesData[] = (float) $correctValue;
+        }
+
+        $counter = 0;
+        foreach ($valutesData as $item) {
+            $counter += 1;
+            DB::table('rates')
+                ->where('date', date('d/m/Y'))
+                ->where('valute_id', $counter)
+                ->update(['value' => $item]);
+            }
     }
 }

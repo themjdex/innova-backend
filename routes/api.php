@@ -15,5 +15,5 @@ use App\Http\Controllers\ValuteController as ValuteController;
 */
 
 Route::get('/', [ValuteController::class, 'index']);
-Route::get('/add', [ValuteController::class, 'add']);
+Route::get('/update', [ValuteController::class, 'update']);
 
