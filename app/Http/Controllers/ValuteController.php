@@ -7,23 +7,32 @@ use App\Models\Rate;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+/**
+ * @property string $url
+ */
+
 class ValuteController extends Controller
 {
     public $url = 'http://www.cbr.ru/scripts/XML_daily.asp';
 
+    /**
+     * Основная функция API, которая возвращает данные на фронт, если они есть, или создает, если их нет, после чего возвращает
+     * @param Request $request запрос с фронта
+     * @return Collection $rates Данные из БД
+     */
     public function index(Request $request) {
         if ($request->has('date')) {
-            $rates = Rate::getJoinedData($request->date);
+            $rates = Rate::get_joined_data($request->date);
             if (!$rates->count()) {
-                $this->addNewValues($request->date);
+                $this->add_new_values($request->date);
             } else {
                return $rates;
             }
         } else {
-            $rates = Rate::getJoinedData(date('d/m/Y'));
+            $rates = Rate::get_joined_data(date('d/m/Y'));
 
             if (!$rates->count()) {
-                $this->addNewValues();
+                $this->add_new_values();
             } else {
                 return $rates;
             }
@@ -31,7 +40,11 @@ class ValuteController extends Controller
 
     }
 
-    public function addNewValues($query = '') {
+    /**
+     * Функция добавления новых данных в БД за новый день
+     * @param string $query Query запрос, который при наличии добавится к запросу к API ЦБ
+     */
+    public function add_new_values($query = '') {
         $checkUrl = $this->url;
         if ($query) {
             $checkUrl = $this->url . '?date_req=' . $query;
@@ -52,10 +65,11 @@ class ValuteController extends Controller
                 'date' => date('d/m/Y')
             ]);
         }
-
-        $this->index();
     }
 
+    /**
+     * Функция перезаписи данных за текущий день при поступлении нового запроса по таймеру с фронта
+     */
     public function update() {
         $xml = simplexml_load_string(file_get_contents($this->url));
         $valutesData = [];
